@@ -19,7 +19,8 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: white;
+    background-color: #FFFC99;
+    /* Changed to updated primary-yellow */
     border-radius: 4px;
     /* Rounded thumb */
 }
@@ -27,18 +28,21 @@ html {
 /* For Firefox */
 * {
     scrollbar-width: thin;
-    scrollbar-color: white transparent;
+    scrollbar-color: #FFFC99 transparent;
+    /* Changed to updated primary-yellow */
 }
 
 /* Additional styles for Firefox to make it more rounded */
 * {
     scrollbar-width: thin;
-    scrollbar-color: white transparent;
+    scrollbar-color: #FFFC99 transparent;
+    /* Changed to updated primary-yellow */
 }
 
 * {
     scrollbar-width: thin;
-    scrollbar-color: white transparent;
+    scrollbar-color: #FFFC99 transparent;
+    /* Changed to updated primary-yellow */
 }
 
 *::-moz-scrollbar {
@@ -51,6 +55,14 @@ html {
 }
 
 *::-moz-scrollbar-thumb {
-    background-color: white;
+    background-color: #FFFC99;
+    /* Changed to updated primary-yellow */
     border-radius: 4px;
+}
+
+::selection {
+    background-color: #FFFC99;
+    /* Added updated primary-yellow background for highlighted text */
+    color: #1F2125;
+    /* Added dark color for highlighted text */
 }
