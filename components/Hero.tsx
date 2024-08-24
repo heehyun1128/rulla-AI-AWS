@@ -40,7 +40,7 @@ const Hero: React.FC = () => {
         transition={{ delay: 0.4, duration: 0.5 }}
         className="mt-12 flex justify-center"
       >
-        <Link href="/professor">
+        <Link href="/transcript">
           <Button className="py-3 px-6 rounded text-sm">
            Try Rulla
           </Button>

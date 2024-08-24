@@ -41,7 +41,7 @@ html {
 
 * {
     scrollbar-width: thin;
-    scrollbar-color: #FFFC99 transparent;
+    scrollbar-color: white transparent;
     /* Changed to updated primary-yellow */
 }
 
@@ -55,7 +55,7 @@ html {
 }
 
 *::-moz-scrollbar-thumb {
-    background-color: #FFFC99;
+    background-color: whit;
     /* Changed to updated primary-yellow */
     border-radius: 4px;
 }
