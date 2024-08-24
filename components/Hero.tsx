@@ -11,28 +11,26 @@ const Hero: React.FC = () => {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className="text-[42px] sm:text-[64px] md:text-[74px] lg:text-[96px] font-extrabold leading-[1.1] mb-4 text-primary text-center tracking-tighter"
+        className="text-[28px] sm:text-[28px] md:text-[42px] lg:text-[48px] xl:text-[62px] font-extrabold leading-[1.1] mb-4 text-center tracking-tighter"
+        style={{
+          background: 'radial-gradient(circle, #ffffff 62%, #999999 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}
       >
-        AI-Powered Insights for
-        <br />
-        your{" "}
-        <span className="relative inline-block">
-          <span className="absolute inset-0 bg-deep-orange opacity-50 transform h-[40%] translate-y-[150%]"></span>
-          <span className="relative">professors</span>
-        </span>
+       AI-Enhanced Sales Transcript Editor 
+       <br />
+       for Smarter Feedback and Analysis
       </motion.h1>
       <motion.p
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.8, duration: 0.5 }}
-        className="text-primary text-[13px] sm:text-lg md:text-xl mt-4 sm:mt-6 text-center tracking-tight px-4 sm:px-0"
+        className="text-[13px] md:text-lg mt-4 sm:mt-6 font-light text-center tracking-tight px-4 sm:px-0"
       >
-        Revolutionize your course selection with AI-powered professor ratings.
-        Comprehensive,{" "}
-        <span className="sm:hidden">
-          <br />
-        </span>
-        data-driven, and presented in a sleek, intuitive interface.
+        Supercharge Your Sales Insights with AI-Powered Transcript Management: Add, Edit, and 
+        <br />
+        Optimize Comments Seamlessly.
       </motion.p>
 
       {/* Button to Professor Page */}
@@ -44,7 +42,7 @@ const Hero: React.FC = () => {
       >
         <Link href="/professor">
           <Button className="py-3 px-6 rounded text-sm">
-            Search Professors
+           Try Rulla
           </Button>
         </Link>
       </motion.div>
@@ -56,12 +54,12 @@ const Hero: React.FC = () => {
         transition={{ delay: 0.6, duration: 0.5 }}
         className="mt-12 sm:mt-20 p-2 bg-white bg-opacity-60 rounded-3xl shadow-6xl relative overflow-hidden backdrop-filter backdrop-blur-3xl"
         style={{
-          boxShadow: "0 0 50px 2px rgba(17, 38, 107, 0.6)",
+          boxShadow: "0 0 50px 2px rgba(255, 255, 255, 0.6)",
         }}
       >
         <div className="absolute inset-0 bg-primary opacity-30 filter blur-3xl"></div>
         <video
-          src="https://videos.pexels.com/video-files/25744128/11904108_2560_1440_24fps.mp4"
+          src="https://videos.pexels.com/video-files/3051490/3051490-uhd_2560_1440_25fps.mp4"
           width={1200}
           height={600}
           autoPlay
@@ -78,8 +76,8 @@ const Hero: React.FC = () => {
         transition={{ delay: 0.8, duration: 0.5 }}
         className="text-charcoal-black text-base sm:text-lg mt-6"
       >
-        Harnessing advanced AI to generate comprehensive professor evaluations
-        from student feedback, optimizing your course selection process.
+        Leveraging AI-powered transcript analysis to transform sales calls into
+        actionable insights, enhancing your team's performance and strategy.
       </motion.p>
     </main>
   );

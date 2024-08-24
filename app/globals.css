@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+    background: 'radial-gradient(circle, #1F2125 30%, #141518 100%)';
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 8px;
+    /* Slightly increased width for better visibility */
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    /* Rounded track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 4px;
+    /* Rounded thumb */
+}
+
+/* For Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: white transparent;
+}
+
+/* Additional styles for Firefox to make it more rounded */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: white transparent;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: white transparent;
+}
+
+*::-moz-scrollbar {
+    width: 8px;
+}
+
+*::-moz-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+}
+
+*::-moz-scrollbar-thumb {
+    background-color: white;
+    border-radius: 4px;
+}
