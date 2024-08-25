@@ -40,6 +40,7 @@ export const lambdaHandler = async (
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
+      
     };
   }
   const { commentId, content, transcriptId, userId, selectedTextId } = body;
@@ -60,11 +61,21 @@ export const lambdaHandler = async (
         message: "Successfully created a comment",
         comment: newComment,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: `Internal server error: ${err}` })
+      body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   }
 };

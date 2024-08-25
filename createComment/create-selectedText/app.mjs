@@ -36,6 +36,11 @@ export const lambdaHandler = async (event) => {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   }
   const { selectedTextId, startIndex, endIndex, transcriptId } = body;
@@ -56,11 +61,21 @@ export const lambdaHandler = async (event) => {
         message: "Successfully created a selected text",
         selectedText: newSelectedText,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   } catch (err) {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   }
 };

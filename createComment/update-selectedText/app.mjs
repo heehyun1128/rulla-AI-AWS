@@ -38,6 +38,11 @@ export const lambdaHandler = async (event) => {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   }
 
@@ -49,6 +54,11 @@ export const lambdaHandler = async (event) => {
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "SelectedText not found" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*", 
+          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
       };
     }
     
@@ -67,11 +77,21 @@ export const lambdaHandler = async (event) => {
         message: "Successfully updated selectedText",
         selectedText: updatedSelectedText,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: `Internal server error: ${err}` })
+      body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    },
     };
   }
 };
