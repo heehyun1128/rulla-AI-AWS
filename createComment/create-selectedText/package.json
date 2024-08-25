@@ -8,13 +8,14 @@
   "license": "MIT",
   "dependencies": {
     "axios": ">=1.6.0",
-    "dynamoose": "^4.0.1"
+    "dynamoose": "^4.0.1",
+    "uuid": "^10.0.0"
   },
   "scripts": {
     "test": "mocha tests/unit/"
-   
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "chai": "^4.3.6",
     "mocha": "^10.1.0"
   }

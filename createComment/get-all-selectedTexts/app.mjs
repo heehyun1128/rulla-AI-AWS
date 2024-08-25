@@ -34,25 +34,32 @@ export const lambdaHandler = async (event) => {
     // Fetch all selectedTexts
     const selectedTexts = await SelectedTextModel.scan().exec();
 
-    return {
+    const response = {
       statusCode: 200,
+
       body: JSON.stringify(selectedTexts),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
+
+    return response;
   } catch (err) {
     console.error("Error fetching selectedTexts:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

@@ -15,13 +15,13 @@ import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
   {
-    "selectedTextId": {
+    selectedTextId: {
       type: String,
     },
-  
-    "startIndex": Number,
-    "endIndex": Number,
-    "transcriptId": String,
+
+    startIndex: Number,
+    endIndex: Number,
+    transcriptId: String,
   },
   {
     timestamps: true,
@@ -39,16 +39,18 @@ export const lambdaHandler = async (event) => {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing selectedTextId" }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
   try {
-    const { selectedTextId} = body;
-    
+    const { selectedTextId } = body;
+
     const existingRecord = await SelectedTextModel.get({ selectedTextId });
 
     if (!existingRecord) {
@@ -56,33 +58,42 @@ export const lambdaHandler = async (event) => {
         statusCode: 404,
         body: JSON.stringify({ error: "SelectedText not found" }),
         headers: {
-          "Access-Control-Allow-Origin": "*", 
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+
           "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
+          "Access-Control-Allow-Headers":
+            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        },
       };
     }
 
     await SelectedTextModel.delete({ selectedTextId });
 
-    return {
+    const response = {
       statusCode: 200,
+
       body: JSON.stringify({ message: "Successfully deleted selected text" }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
+
+    return response;
   } catch (err) {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

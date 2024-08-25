@@ -5,12 +5,53 @@ import CommentSection from '@/components/CommentSection';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { createComment, getComments, updateComment, deleteComment, Comment } from '@/lib/api';
+import axios from 'axios';
 
 const TranscriptPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [selectedText, setSelectedText] = useState('');
   const transcriptRef = useRef<HTMLDivElement>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  
+  const [transcript, setTranscript] = useState('');
+
+  useEffect(() => {
+    fetchComments();
+    setTranscript(`Sales Representative (Sarah):
+
+"Hi John, thanks for taking the time to speak with me today. I wanted to discuss how our new software can help streamline your team's project management tasks. Could you share a bit about your current process and any challenges you're facing?"
+
+Client (John):
+
+"Sure, Sarah. Right now, we're using a mix of different tools, but it's becoming a bit overwhelming. Managing deadlines and team collaboration has been tricky, especially with remote work becoming more common."
+
+Sarah:
+
+"I completely understand. Our software integrates all your project management needs into one platform, making it easier to track progress and communicate with your team, no matter where they are. How important is it for you to have real-time collaboration features?"
+
+John:
+
+"Real-time collaboration is crucial for us. With our team spread across different time zones, we need a tool that allows us to work together efficiently, regardless of location."
+
+Sarah:
+
+"That's great to hear, John. Our software excels in real-time collaboration. It offers features like live document editing, instant messaging, and virtual whiteboards. This means your team can work together as if they were in the same room, even when they're miles apart."`)
+  }, []);
+
+  const fetchComments = async () => {
+    try {
+      const fetchedComments = await getComments('your-transcript-id');
+      setComments(fetchedComments);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
 
   useEffect(() => {
     const handleSelection = () => {
@@ -39,10 +80,6 @@ const TranscriptPage: React.FC = () => {
     }
   }, []);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
-
   const handleCommentClick = () => {
     setIsModalOpen(true);
     setEditingCommentId(null);
@@ -50,42 +87,50 @@ const TranscriptPage: React.FC = () => {
     console.log("Selected text for comment:", selectedText);
   };
 
-  const [comments, setComments] = useState([
-    { id: 1, text: "Great opening question, Sarah! It shows you're interested in understanding the client's needs.", reference: "Hi John, thanks for..." },
-    { id: 2, text: "John's pain points are clear. Make sure to address how our software solves each one.", reference: "Sure, Sarah. Right now..." },
-    { id: 3, text: "Good job highlighting the integration aspect. Consider providing a specific example of how it works.", reference: "I completely understand..." },
-    { id: 4, text: "The question about real-time collaboration is spot on. It directly addresses their remote work challenges.", reference: "Real-time collaboration..." },
-  ]);
-
-  const handleSubmitComment = () => {
+  const handleSubmitComment = async () => {
     if (newComment.trim()) {
-      if (editingCommentId !== null) {
-        setComments(comments.map(comment => 
-          comment.id === editingCommentId ? { ...comment, text: newComment.trim() } : comment
-        ));
-      } else {
-        const newId = Math.max(...comments.map(c => c.id), 0) + 1;
-        const reference = selectedText.length > 20 ? selectedText.substring(0, 20) + "..." : selectedText;
-        setComments([...comments, { id: newId, text: newComment.trim(), reference }]);
+      try {
+        if (editingCommentId) {
+          const updatedComment = await updateComment({
+            commentId: editingCommentId,
+            content: newComment.trim(),
+            transcriptId: 'your-transcript-id',
+            userId: 'your-user-id',
+            selectedTextId: selectedText,
+          });
+          setComments(comments.map(c => c.commentId === updatedComment.commentId ? updatedComment : c));
+        } else {
+          const createdComment = await createComment({
+            content: newComment.trim(),
+            transcriptId: 'your-transcript-id',
+            userId: 'your-user-id',
+            selectedTextId: selectedText,
+          });
+          setComments([...comments, createdComment]);
+        }
+        setNewComment('');
+        setIsModalOpen(false);
+        setEditingCommentId(null);
+        setSelectedText('');
+      } catch (error) {
+        console.error('Error submitting comment:', error);
       }
-      setNewComment('');
-      setIsModalOpen(false);
-      setEditingCommentId(null);
-      setSelectedText('');
     }
   };
 
-  const handleEditComment = (id: number) => {
-    const commentToEdit = comments.find(comment => comment.id === id);
-    if (commentToEdit) {
-      setNewComment(commentToEdit.text);
-      setEditingCommentId(id);
-      setIsModalOpen(true);
-    }
+  const handleEditComment = (comment: Comment) => {
+    setNewComment(comment.content);
+    setEditingCommentId(comment.commentId);
+    setIsModalOpen(true);
   };
 
-  const handleDeleteComment = (id: number) => {
-    setComments(comments.filter(comment => comment.id !== id));
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment(commentId);
+      setComments(comments.filter(comment => comment.commentId !== commentId));
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
   };
 
   const handleCloseModal = () => {
@@ -99,8 +144,15 @@ const TranscriptPage: React.FC = () => {
     console.log('Image clicked');
   };
 
+  const summarizeContent=async (content:string)=>{
+    console.log(content)
+    const res=await axios.post('/api/summary',{text:content})
+    console.log(res.data)
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 bg-dark">
+        <button onClick={async()=>await summarizeContent(transcript)}>Summarize Transcript & Comments</button>
       <div className="flex flex-col lg:flex-row gap-4">
         <div ref={transcriptRef} className="lg:w-3/4 bg-white shadow-md p-6 rounded-lg relative">
           {showPopup && (
@@ -141,7 +193,7 @@ const TranscriptPage: React.FC = () => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-dark">{editingCommentId !== null ? 'Edit Comment' : 'Add a Comment'}</DialogTitle>
+            <DialogTitle className="text-dark">{editingCommentId ? 'Edit Comment' : 'Add a Comment'}</DialogTitle>
           </DialogHeader>
           <Textarea
             value={newComment}
@@ -151,7 +203,7 @@ const TranscriptPage: React.FC = () => {
           />
           <DialogFooter>
             <Button onClick={handleCloseModal} variant="outline" className="text-dark">Cancel</Button>
-            <Button onClick={handleSubmitComment}>{editingCommentId !== null ? 'Update' : 'Submit'}</Button>
+            <Button onClick={handleSubmitComment}>{editingCommentId ? 'Update' : 'Submit'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

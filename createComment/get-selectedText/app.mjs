@@ -16,9 +16,9 @@ export const SelectedTextSchema = new dynamoose.Schema(
   {
     selectedTextId: {
       type: String,
-      required: true, 
+      required: true,
     },
- 
+
     startIndex: Number,
     endIndex: Number,
     transcriptId: String,
@@ -31,17 +31,18 @@ export const SelectedTextSchema = new dynamoose.Schema(
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
 export const lambdaHandler = async (event) => {
-  
   const body = event.body ? JSON.parse(event.body) : null;
   if (!body.selectedTextId) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing selectedTextId" }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
@@ -53,31 +54,40 @@ export const lambdaHandler = async (event) => {
         statusCode: 404,
         body: JSON.stringify({ error: "SelectedText not found!" }),
         headers: {
-          "Access-Control-Allow-Origin": "*", 
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+
           "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
+          "Access-Control-Allow-Headers":
+            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        },
       };
     }
 
-    return {
+    const response = {
       statusCode: 200,
+
       body: JSON.stringify(selectedText),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
+
+    return response;
   } catch (err) {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

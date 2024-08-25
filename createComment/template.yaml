@@ -1,18 +1,28 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   createComment
 
   Sample SAM Template for createComment
-  
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
 Globals:
   Function:
     Timeout: 3
 
 Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: MyApi
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'http://localhost:3000'"
+        
+
   CreateCommentFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: createComment
       CodeUri: create-comment/
@@ -22,13 +32,14 @@ Resources:
         - arm64
       Events:
         CreateComment:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /createComment
             Method: post
+            RestApiId: !Ref MyApi
 
   UpdateCommentFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: updateComment
       CodeUri: update-comment/
@@ -37,14 +48,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateComment:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        UpdateComment:
+          Type: Api
           Properties:
             Path: /updateComment
             Method: put
+            RestApiId: !Ref MyApi
 
   DeleteCommentFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: deleteComment
       CodeUri: delete-comment/
@@ -53,14 +65,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateComment:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        DeleteComment:
+          Type: Api
           Properties:
             Path: /deleteComment
             Method: delete
+            RestApiId: !Ref MyApi
 
   GetCommentFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: getComment
       CodeUri: get-comment/
@@ -69,14 +82,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateComment:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        GetComment:
+          Type: Api
           Properties:
             Path: /getComment
             Method: get
+            RestApiId: !Ref MyApi
 
   GetAllCommentsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: getAllComments
       CodeUri: get-all-comments/
@@ -85,14 +99,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateComment:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        GetAllComments:
+          Type: Api
           Properties:
             Path: /getAllComments
             Method: get
+            RestApiId: !Ref MyApi
 
   CreateSelectedTextFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: createSelectedText
       CodeUri: create-selectedText/
@@ -102,13 +117,14 @@ Resources:
         - arm64
       Events:
         CreateSelectedText:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /createSelectedText
             Method: post
+            RestApiId: !Ref MyApi
 
   UpdateSelectedTextFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: updateSelectedText
       CodeUri: update-selectedText/
@@ -117,14 +133,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateSelectedText:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        UpdateSelectedText:
+          Type: Api
           Properties:
             Path: /updateSelectedText
             Method: put
+            RestApiId: !Ref MyApi
 
   DeleteSelectedTextFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: deleteSelectedText
       CodeUri: delete-selectedText/
@@ -133,14 +150,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateSelectedText:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        DeleteSelectedText:
+          Type: Api
           Properties:
             Path: /deleteSelectedText
             Method: delete
+            RestApiId: !Ref MyApi
 
   GetSelectedTextFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: getSelectedText
       CodeUri: get-selectedText/
@@ -149,14 +167,15 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateSelectedText:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        GetSelectedText:
+          Type: Api
           Properties:
             Path: /getSelectedText
             Method: get
+            RestApiId: !Ref MyApi
 
   GetAllSelectedTextsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: getAllSelectedTexts
       CodeUri: get-all-selectedTexts/
@@ -165,19 +184,17 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateSelectedText:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        GetAllSelectedTexts:
+          Type: Api
           Properties:
             Path: /getAllSelectedTexts
             Method: get
+            RestApiId: !Ref MyApi
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CreateCommentApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
   CreateCommentFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt CreateCommentFunction.Arn

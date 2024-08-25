@@ -14,15 +14,14 @@ import dynamoose from "dynamoose";
 
 export const CommentSchema = new dynamoose.Schema(
   {
-    "commentId":{
-      type:String
-  },
-  "content":String,
-  "transcriptId": String,
-  "userId": String,
-  "selectedTextId": String,
-  // "commentImageUrl": { type: String, required: false },
-
+    commentId: {
+      type: String,
+    },
+    content: String,
+    transcriptId: String,
+    userId: String,
+    selectedTextId: String,
+    // "commentImageUrl": { type: String, required: false },
   },
   {
     timestamps: true,
@@ -32,60 +31,74 @@ export const CommentSchema = new dynamoose.Schema(
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
 export const lambdaHandler = async (event) => {
-  
   const body = event.body ? JSON.parse(event.body) : null;
 
-  if (!body.commentId|| !body) {
+  if (!body.commentId || !body) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
   try {
-    const { commentId,...updateFields } = body;
+    const { commentId, ...updateFields } = body;
     const existingComment = await CommentModel.get({ commentId });
     if (!existingComment) {
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Comment not found" }),
         headers: {
-          "Access-Control-Allow-Origin": "*", 
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+
           "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-          "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
+          "Access-Control-Allow-Headers":
+            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        },
       };
     }
-    const updatedComment = await CommentModel.update({ commentId }, updateFields, {
-      return: "item",
-    });
+    const updatedComment = await CommentModel.update(
+      { commentId },
+      updateFields,
+      {
+        return: "item",
+      }
+    );
 
-    return {
+    const response = {
       statusCode: 200,
+
       body: JSON.stringify({
         message: "Successfully updated comment",
         comment: updatedComment,
       }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
+
+    return response;
   } catch (err) {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
       headers: {
-        "Access-Control-Allow-Origin": "*", 
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    },
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };
