@@ -26,6 +26,10 @@ Resources:
           Properties:
             Path: /createComment
             Method: post
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   UpdateCommentFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -42,6 +46,10 @@ Resources:
           Properties:
             Path: /updateComment
             Method: put
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   DeleteCommentFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -58,6 +66,10 @@ Resources:
           Properties:
             Path: /deleteComment
             Method: delete
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   GetCommentFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -74,6 +86,10 @@ Resources:
           Properties:
             Path: /getComment
             Method: get
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   GetAllCommentsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -90,6 +106,10 @@ Resources:
           Properties:
             Path: /getAllComments
             Method: get
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   CreateSelectedTextFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -106,6 +126,10 @@ Resources:
           Properties:
             Path: /createSelectedText
             Method: post
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   UpdateSelectedTextFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -122,6 +146,10 @@ Resources:
           Properties:
             Path: /updateSelectedText
             Method: put
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   DeleteSelectedTextFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -138,6 +166,10 @@ Resources:
           Properties:
             Path: /deleteSelectedText
             Method: delete
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   GetSelectedTextFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -154,6 +186,10 @@ Resources:
           Properties:
             Path: /getSelectedText
             Method: get
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
   GetAllSelectedTextsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -170,6 +206,10 @@ Resources:
           Properties:
             Path: /getAllSelectedTexts
             Method: get
+            Cors:
+              AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

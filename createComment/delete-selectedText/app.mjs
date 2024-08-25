@@ -55,10 +55,17 @@ export const lambdaHandler = async (event) => {
 
     await SelectedTextModel.delete({ selectedTextId });
 
-    return {
+    const response = {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
+      },
       body: JSON.stringify({ message: "Successfully deleted selected text" }),
     };
+
+    return response;
   } catch (err) {
     return {
       statusCode: 500,

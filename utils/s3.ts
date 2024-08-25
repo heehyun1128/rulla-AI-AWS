@@ -20,3 +20,7 @@ export async function generateUploadURL(fileName: string) {
   const uploadURL = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   return uploadURL;
 }
+
+export function getImageURL(fileName: string) {
+  // Implementation of getImageURL
+}

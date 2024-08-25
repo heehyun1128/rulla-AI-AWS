@@ -50,13 +50,20 @@ export const lambdaHandler = async (event) => {
     });
     await newSelectedText.save();
 
-    return {
+    const response = {
       statusCode: 201,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
+      },
       body: JSON.stringify({
         message: "Successfully created a selected text",
         selectedText: newSelectedText,
       }),
     };
+
+    return response;
   } catch (err) {
     return {
       statusCode: 500,

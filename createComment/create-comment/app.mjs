@@ -54,13 +54,20 @@ export const lambdaHandler = async (
     });
     await newComment.save();
 
-    return {
+    const response = {
       statusCode: 201,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS"
+      },
       body: JSON.stringify({
         message: "Successfully created a comment",
         comment: newComment,
       }),
     };
+
+    return response;
   } catch (err) {
     return {
       statusCode: 500,
@@ -68,4 +75,3 @@ export const lambdaHandler = async (
     };
   }
 };
-
