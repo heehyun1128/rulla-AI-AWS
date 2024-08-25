@@ -10,11 +10,12 @@ interface Comment extends BaseComment {
 interface CommentSectionProps {
   comments: Comment[];
   onEdit: (comment: Comment) => void;
-  onDelete: (commentId: string) => void;
+  onDelete: (commentId: string) => Promise<void>;
   onAdd: () => void;
+  isLoading: boolean; // Added this line
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ comments, onEdit, onDelete, onAdd }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ comments, onEdit, onDelete, onAdd, isLoading }) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
