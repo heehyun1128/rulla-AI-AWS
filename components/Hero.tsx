@@ -77,7 +77,7 @@ const Hero: React.FC = () => {
         className="text-charcoal-black text-base sm:text-lg mt-6"
       >
         Leveraging AI-powered transcript analysis to transform sales calls into
-        actionable insights, enhancing your team's performance and strategy.
+        actionable insights, enhancing your team&apos;s performance and strategy.
       </motion.p>
     </main>
   );

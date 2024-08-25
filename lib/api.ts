@@ -55,7 +55,7 @@ export const updateComment = async ( updateData: Partial<Comment>): Promise<Comm
 export const deleteComment = async (commentId: string): Promise<void> => {
   try {
     console.log(commentId)
-    await axios.delete(`${API_BASE_URL}/deleteComment`,{commentId:commentId});
+    await axios.delete(`${API_BASE_URL}/deleteComment`,{ params: { commentId }});
   } catch (error) {
     console.error('Error deleting comment:', error);
     throw error;
