@@ -43,7 +43,7 @@ const TestCommentOperations: React.FC = () => {
   const handleUpdate = async () => {
     if (!editingComment) return;
     try {
-      const updatedComment = await updateComment(editingComment.commentId, {
+      const updatedComment = await updateComment( {
         content: editContent,
       });
       setComments(
