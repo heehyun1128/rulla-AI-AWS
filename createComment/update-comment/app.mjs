@@ -21,7 +21,7 @@ export const CommentSchema = new dynamoose.Schema(
   "transcriptId": String,
   "userId": String,
   "selectedTextId": String,
-  "commentImageUrl": { type: String, required: false },
+  // "commentImageUrl": { type: String, required: false },
 
   },
   {
