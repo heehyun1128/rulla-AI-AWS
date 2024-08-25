@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  createComment
+
+  Sample SAM Template for createComment
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  CreateCommentFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: createComment
+      CodeUri: create-comment/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateComment:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /createComment
+            Method: post
+
+  UpdateCommentFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: updateComment
+      CodeUri: update-comment/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateComment:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /updateComment
+            Method: put
+
+  DeleteCommentFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: deleteComment
+      CodeUri: delete-comment/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateComment:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /deleteComment
+            Method: put
+
+  GetCommentFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: getComment
+      CodeUri: get-comment/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateComment:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /getComment
+            Method: get
+
+  GetAllCommentsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: getAllComments
+      CodeUri: get-all-comments/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateComment:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /getAllComments
+            Method: get
+
+  CreateSelectedTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: createSelectedText
+      CodeUri: create-selectedText/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateSelectedText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /createSelectedText
+            Method: post
+
+  UpdateSelectedTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: updateSelectedText
+      CodeUri: update-selectedText/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateSelectedText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /updateSelectedText
+            Method: put
+
+  DeleteSelectedTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: deleteSelectedText
+      CodeUri: delete-selectedText/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateSelectedText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /deleteSelectedText
+            Method: put
+
+  GetSelectedTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: getSelectedText
+      CodeUri: get-selectedText/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateSelectedText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /getSelectedText
+            Method: get
+
+  GetAllSelectedTextsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: getAllSelectedTexts
+      CodeUri: get-all-selectedTexts/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - arm64
+      Events:
+        CreateSelectedText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /getAllSelectedTexts
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  CreateCommentApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  CreateCommentFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt CreateCommentFunction.Arn
+  CreateCommentFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt CreateCommentFunctionRole.Arn
