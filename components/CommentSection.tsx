@@ -16,6 +16,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({ comments, onEdit, onDelete, onAdd, isLoading }) => {
+  console.log("111",comments)
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -58,7 +59,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, onEdit, onDel
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => onEdit(comment)}
+                    onClick={() => {
+                      console.log("edit",comment)
+                      onEdit(comment)}}
                     className="text-xs text-blue-500 hover:text-blue-600"
                   >
                     Edit

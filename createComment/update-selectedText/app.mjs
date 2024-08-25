@@ -30,50 +30,74 @@ export const SelectedTextSchema = new dynamoose.Schema(
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
 export const lambdaHandler = async (event) => {
-  console.log("Received event:", JSON.stringify(event, null, 2));
+  const body = event.body ? JSON.parse(event.body) : null;
 
-  let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch (error) {
-    console.error("Error parsing event body:", error);
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid request body" }),
-    };
-  }
-
-  if (!body.selectedTextId || !body.startIndex || !body.endIndex) {
-    console.error("Missing required fields");
+  if (!body.selectedTextId || !body) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
   try {
+    const { selectedTextId, ...updateFields } = body;
+
+    const existingSelectedText = await SelectedTextModel.get({
+      selectedTextId,
+    });
+    if (!existingSelectedText) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: "SelectedText not found" }),
+        headers: {
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+          "Access-Control-Allow-Headers":
+            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        },
+      };
+    }
+
     const updatedSelectedText = await SelectedTextModel.update(
+      { selectedTextId },
+      updateFields,
       {
-        selectedTextId: body.selectedTextId,
-        startIndex: body.startIndex,
-        endIndex: body.endIndex,
-        transcriptId: body.transcriptId,
-      },
-      { return: "item" }
+        return: "item",
+      }
     );
 
-    return {
+    const response = {
       statusCode: 200,
+    
       body: JSON.stringify({
         message: "Successfully updated selectedText",
         selectedText: updatedSelectedText,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
+
+    return response;
   } catch (err) {
-    console.error("Error updating selectedText:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Could not update the selectedText" }),
+      body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

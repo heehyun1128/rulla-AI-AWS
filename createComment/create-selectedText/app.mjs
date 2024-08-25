@@ -10,9 +10,8 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-
-import dotenv from "dotenv";
-dotenv.config();
+import dynamoose from "dynamoose";
+import { v4 as uuidv4 } from 'uuid';
 
 export const SelectedTextSchema = new dynamoose.Schema(
   {
@@ -30,71 +29,49 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-const CommentSchema = new dynamoose.Schema(
-  {
-    commentId: {
-      type: String,
-      hashKey: true,
-    },
-    selectedTextId: String,
-    content: String,
-    userId: String,
-  },
-  {
-    timestamps: true,
-  }
-);
-
-const CommentModel = dynamoose.model("Comments", CommentSchema);
-
 export const lambdaHandler = async (event) => {
   const body = event.body ? JSON.parse(event.body) : null;
 
-  if (
-    !body ||
-    !body.selectedTextId ||
-    !body.selectedText ||
-    !body.transcriptId ||
-    !body.commentId ||
-    !body.commentContent ||
-    !body.userId
-  ) {
+  if (!body) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
-  const {
-    selectedTextId,
-    selectedText,
-    transcriptId,
-    commentId,
-    commentContent,
-    userId,
-  } = body;
+  const { startIndex, endIndex, transcriptId } = body;
   try {
+    const selectedTextId = uuidv4();
     const newSelectedText = new SelectedTextModel({
       selectedTextId,
-      selectedText,
+
+      startIndex,
+      endIndex,
       transcriptId,
+      // createdAt: new Date().toISOString(),
     });
     await newSelectedText.save();
 
-    const newComment = new CommentModel({
-      commentId,
-      selectedTextId,
-      content: commentContent,
-      userId,
-    });
-    await newComment.save();
-
     const response = {
       statusCode: 201,
+
       body: JSON.stringify({
-        message: "Successfully created a selected text with comment",
+        message: "Successfully created a selected text",
         selectedText: newSelectedText,
-        comment: newComment,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
 
     return response;
@@ -102,6 +79,13 @@ export const lambdaHandler = async (event) => {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

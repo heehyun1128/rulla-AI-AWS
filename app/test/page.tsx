@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { getAllComments, deleteComment, updateComment } from '@/lib/api';
+import React, { useState, useEffect } from "react";
+import { getAllComments, deleteComment, updateComment } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 const TestCommentOperations: React.FC = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [editingComment, setEditingComment] = useState<any | null>(null);
-  const [editContent, setEditContent] = useState('');
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     fetchComments();
@@ -17,19 +17,21 @@ const TestCommentOperations: React.FC = () => {
 
   const fetchComments = async () => {
     try {
-      const fetchedComments = await getAllComments('1');
+      const fetchedComments = await getAllComments("1");
       setComments(fetchedComments);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error("Error fetching comments:", error);
     }
   };
 
   const handleDelete = async (commentId: string) => {
     try {
       await deleteComment(commentId);
-      setComments(comments.filter(comment => comment.commentId !== commentId));
+      setComments(
+        comments.filter((comment) => comment.commentId !== commentId)
+      );
     } catch (error) {
-      console.error('Error deleting comment:', error);
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -41,15 +43,18 @@ const TestCommentOperations: React.FC = () => {
   const handleUpdate = async () => {
     if (!editingComment) return;
     try {
-      const updatedComment = await updateComment(
-        editingComment.commentId,
-        { content: editContent }
+      const updatedComment = await updateComment(editingComment.commentId, {
+        content: editContent,
+      });
+      setComments(
+        comments.map((c) =>
+          c.commentId === updatedComment.commentId ? updatedComment : c
+        )
       );
-      setComments(comments.map(c => c.commentId === updatedComment.commentId ? updatedComment : c));
       setEditingComment(null);
-      setEditContent('');
+      setEditContent("");
     } catch (error) {
-      console.error('Error updating comment:', error);
+      console.error("Error updating comment:", error);
     }
   };
 
@@ -60,7 +65,10 @@ const TestCommentOperations: React.FC = () => {
         <h2 className="text-xl font-semibold mb-2 text-white">Comments:</h2>
         <ul className="space-y-4">
           {comments.map((comment) => (
-            <li key={comment.commentId} className="bg-gray-700 p-4 rounded-md text-white">
+            <li
+              key={comment.commentId}
+              className="bg-gray-700 p-4 rounded-md text-white"
+            >
               {editingComment?.commentId === comment.commentId ? (
                 <div>
                   <Textarea
@@ -68,18 +76,35 @@ const TestCommentOperations: React.FC = () => {
                     onChange={(e) => setEditContent(e.target.value)}
                     className="mb-2 text-gray-900"
                   />
-                  <Button onClick={handleUpdate} className="mr-2">Save</Button>
-                  <Button onClick={() => setEditingComment(null)}>Cancel</Button>
+                  <Button onClick={handleUpdate} className="mr-2">
+                    Save
+                  </Button>
+                  <Button onClick={() => setEditingComment(null)}></Button>
                 </div>
               ) : (
                 <div>
-                  <p><strong>Content:</strong> {comment.content}</p>
-                  <p><strong>User ID:</strong> {comment.userId}</p>
-                  <p><strong>Transcript ID:</strong> {comment.transcriptId}</p>
-                  <p><strong>Selected Text:</strong> {comment.selectedTextId}</p>
+                  <p>
+                    <strong>Content:</strong> {comment.content}
+                  </p>
+                  <p>
+                    <strong>User ID:</strong> {comment.userId}
+                  </p>
+                  <p>
+                    <strong>Transcript ID:</strong> {comment.transcriptId}
+                  </p>
+                  <p>
+                    <strong>Selected Text:</strong> {comment.selectedTextId}
+                  </p>
                   <div className="mt-2">
-                    <Button onClick={() => handleEdit(comment)} className="mr-2">Edit</Button>
-                    <Button onClick={() => handleDelete(comment.commentId)}>Delete</Button>
+                    <Button
+                      onClick={() => handleEdit(comment)}
+                      className="mr-2"
+                    >
+                      Edit
+                    </Button>
+                    <Button onClick={() => handleDelete(comment.commentId)}>
+                      Delete
+                    </Button>
                   </div>
                 </div>
               )}

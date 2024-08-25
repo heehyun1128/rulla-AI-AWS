@@ -10,25 +10,18 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-
 import dynamoose from "dynamoose";
 
 export const CommentSchema = new dynamoose.Schema(
   {
     commentId: {
       type: String,
-      hashKey: true,
     },
-    content: {
-      type: String,
-      required: true,
-    },
-    selectedText: {
-      type: String,
-      required: true,
-    },
+    content: String,
     transcriptId: String,
     userId: String,
+    selectedTextId: String,
+    // "commentImageUrl": { type: String, required: false },
   },
   {
     timestamps: true,
@@ -38,58 +31,74 @@ export const CommentSchema = new dynamoose.Schema(
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
 export const lambdaHandler = async (event) => {
-  console.log("Received event:", JSON.stringify(event, null, 2));
+  const body = event.body ? JSON.parse(event.body) : null;
 
-  let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch (error) {
-    console.error("Error parsing event body:", error);
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid request body" }),
-    };
-  }
-
-  if (!body.commentId || !body.content || !body.selectedText) {
-    console.error("Missing required fields");
+  if (!body.commentId || !body) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
   try {
-    const existingComment = await CommentModel.get({
-      commentId: body.commentId,
-    });
+    const { commentId, ...updateFields } = body;
+    const existingComment = await CommentModel.get({ commentId });
     if (!existingComment) {
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Comment not found" }),
+        headers: {
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+
+          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+          "Access-Control-Allow-Headers":
+            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        },
       };
     }
+    const updatedComment = await CommentModel.update(
+      { commentId },
+      updateFields,
+      {
+        return: "item",
+      }
+    );
 
-    const updatedComment = await CommentModel.update({
-      commentId: body.commentId,
-      content: body.content,
-      selectedText: body.selectedText,
-      transcriptId: body.transcriptId,
-      userId: body.userId,
-    });
-
-    return {
+    const response = {
       statusCode: 200,
+
       body: JSON.stringify({
-        message: "Comment updated successfully",
+        message: "Successfully updated comment",
         comment: updatedComment,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
-  } catch (error) {
-    console.error("Error updating comment:", error);
+
+    return response;
+  } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to update comment" }),
+      body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

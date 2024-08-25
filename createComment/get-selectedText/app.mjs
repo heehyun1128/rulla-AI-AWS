@@ -10,7 +10,6 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
@@ -30,51 +29,63 @@ export const SelectedTextSchema = new dynamoose.Schema(
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
 export const lambdaHandler = async (event) => {
-  console.log("Received event:", JSON.stringify(event, null, 2));
-
-  let selectedTextId;
-  try {
-    selectedTextId = event.pathParameters?.selectedTextId;
-  } catch (error) {
-    console.error("Error parsing event path parameters:", error);
+  const body = event.body ? JSON.parse(event.body) : null;
+  if (!body.selectedTextId) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Invalid request parameters" }),
-    };
-  }
+      body: JSON.stringify({ error: "Missing selectedTextId" }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
 
-  if (!selectedTextId) {
-    console.error("Missing required parameter: selectedTextId");
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "Missing required parameter: selectedTextId",
-      }),
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
   try {
+    const { selectedTextId } = body;
     const selectedText = await SelectedTextModel.get({ selectedTextId });
     if (!selectedText) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: "Selected text not found!" }),
+        body: JSON.stringify({ error: "SelectedText not found!" }),
+        headers: {
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+
+          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+          "Access-Control-Allow-Headers":
+            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        },
       };
     }
 
-    console.log("Selected text fetched successfully:", selectedText);
-
     const response = {
       statusCode: 200,
+
       body: JSON.stringify(selectedText),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
 
     return response;
   } catch (err) {
-    console.error("Error fetching selected text:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

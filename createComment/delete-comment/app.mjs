@@ -10,25 +10,18 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-
 import dynamoose from "dynamoose";
 
 export const CommentSchema = new dynamoose.Schema(
   {
     commentId: {
       type: String,
-      hashKey: true,
     },
-    content: {
-      type: String,
-      required: true,
-    },
-    selectedText: {
-      type: String,
-      required: true,
-    },
+    content: String,
     transcriptId: String,
     userId: String,
+    selectedTextId: String,
+    // "commentImageUrl": { type: String, required: false },
   },
   {
     timestamps: true,
@@ -37,53 +30,88 @@ export const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
+export const SelectedTextSchema = new dynamoose.Schema(
+  {
+    selectedTextId: {
+      type: String,
+      hashKey: true,
+    },
+    selectedText: String,
+    transcriptId: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
+
 export const lambdaHandler = async (event) => {
-  console.log("Received event:", JSON.stringify(event, null, 2));
+  // const { commentId } = event.pathParameters || {};
 
-  let commentId;
-  try {
-    commentId = event.pathParameters?.commentId;
-  } catch (error) {
-    console.error("Error parsing event path parameters:", error);
+  const body = event.body ? JSON.parse(event.body) : null;
+  if (!body.commentId) {
     return {
       statusCode: 400,
-      headers: headers,
-      body: JSON.stringify({ error: "Invalid request parameters" }),
-    };
-  }
+      body: JSON.stringify({ error: "Missing commentId" }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
 
-  if (!commentId) {
-    console.error("Missing required parameter: commentId");
-    return {
-      statusCode: 400,
-      headers: headers,
-      body: JSON.stringify({ error: "Missing required parameter: commentId" }),
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 
   try {
-    const comment = await CommentModel.get({ commentId });
-    if (!comment) {
-      return {
-        statusCode: 404,
-        headers: headers,
-        body: JSON.stringify({ error: "Comment not found!" }),
-      };
-    }
+    const { commentId } = body;
+    // const comment = await CommentModel.get({ commentId });
+    // if (!comment) {
+    //   return {
+    //     statusCode: 404,
+    //     body: JSON.stringify({ error: "Comment not found!" }),
+    //     headers: {
+    //       "Access-Control-Allow-Origin": "http://localhost:3000",
 
+    //       "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+    //       "Access-Control-Allow-Headers":
+    //         "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    //     },
+    //   };
+    // }
+    // const { selectedTextId } = comment;
+
+    // if (selectedTextId) {
+    //   await SelectedTextModel.delete({ selectedTextId });
+    // }
     await CommentModel.delete({ commentId });
 
-    return {
+    const response = {
       statusCode: 200,
-      headers: headers,
+
       body: JSON.stringify({ message: "Successfully deleted comment" }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
+
+    return response;
   } catch (err) {
-    console.error("Error deleting comment:", err);
     return {
       statusCode: 500,
-      headers: headers,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
+      headers: {
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+
+        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+        "Access-Control-Allow-Headers":
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+      },
     };
   }
 };

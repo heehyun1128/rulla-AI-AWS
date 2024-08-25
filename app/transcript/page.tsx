@@ -23,6 +23,8 @@ const TranscriptPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const [transcript, setTranscript] = useState('');
+  const [transcriptSum, setTranscriptSum] = useState('');
+  
 
   useEffect(() => {
     fetchComments();
@@ -93,31 +95,44 @@ Sarah:
     setNewComment('');
     console.log("Selected text for comment:", selectedText);
   };
-
   const handleSubmitComment = async () => {
     if (newComment.trim()) {
       try {
         setIsLoading(true);
-        const commentId = uuidv4();
-        const newCommentData: Comment = {
-          commentId,
+        
+        // Determine if we are updating an existing comment or creating a new one
+        const commentData: Comment = {
+          commentId: editingCommentId || uuidv4(), // Use existing id if editing, else generate a new one
           content: newComment.trim(),
           transcriptId: 'your-transcript-id',
           userId: 'your-user-id',
           selectedTextId: selectedText,
           isTemporary: true,
         };
-
-        // Optimistically add the comment to the UI
-        setComments(prevComments => [...prevComments, newCommentData]);
-
-        // Perform API call without updating local state
+  
+      
+        setComments(prevComments => {
+          if (editingCommentId) {
+            // Update existing comment
+            return prevComments.map(comment =>
+              comment.commentId === editingCommentId ? commentData : comment
+            );
+          } else {
+       
+            return [...prevComments, commentData];
+          }
+        });
+  
+       
         if (editingCommentId) {
-          await updateComment(editingCommentId, newCommentData);
+     
+          await updateComment(commentData);
         } else {
-          await createComment(newCommentData);
+       
+          await createComment(commentData);
         }
-
+  
+       
         setNewComment('');
         setIsModalOpen(false);
         setEditingCommentId(null);
@@ -130,6 +145,52 @@ Sarah:
       }
     }
   };
+  
+  // const handleSubmitComment = async () => {
+  //   if (newComment.trim()) {
+  //     try {
+  //       setIsLoading(true);
+  //       const commentId = uuidv4();
+  //       const newCommentData: Comment = {
+  //         commentId,
+  //         content: newComment.trim(),
+  //         transcriptId: 'your-transcript-id',
+  //         userId: 'your-user-id',
+  //         selectedTextId: selectedText,
+  //         isTemporary: true,
+  //       };
+
+  //       // Optimistically add the comment to the UI
+  //       setComments(prevComments => [...prevComments, newCommentData]);
+
+  //       // Perform API call without updating local state
+  //       console.log("editingCommentId",editingCommentId)
+  //       console.log("newCommentData",newCommentData)
+  //       if (editingCommentId) {
+  //         await updateComment({
+  //           commentId:editingCommentId, 
+  //           content:newCommentData.content,
+  //           transcriptId:newCommentData.transcriptId,
+  //           userId:newCommentData.userId,
+
+  //           });
+  //       } else {
+  //         console.log("called")
+  //         await createComment(newCommentData);
+  //       }
+
+  //       setNewComment('');
+  //       setIsModalOpen(false);
+  //       setEditingCommentId(null);
+  //       setSelectedText('');
+  //     } catch (error) {
+  //       console.error('Error submitting comment:', error);
+  //       alert('Failed to submit comment to the server. The local comment will remain until the page is refreshed.');
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // };
 
   const handleEditComment = (comment: Comment) => {
     setNewComment(comment.content);
@@ -161,11 +222,16 @@ Sarah:
     console.log(content)
     const res=await axios.post('/api/summary',{text:content})
     console.log(res.data)
+    setTranscriptSum(res.data.summary)
   }
 
   return (
     <div className="container mx-auto px-4 py-8 bg-dark">
         <button onClick={async()=>await summarizeContent(transcript)}>Summarize Transcript & Comments</button>
+       { transcriptSum && <div>
+          <div><h4>Summary</h4></div>
+          <p>{transcriptSum}</p>
+        </div>}
       <div className="flex flex-col lg:flex-row gap-4">
         <div ref={transcriptRef} className="lg:w-3/4 bg-white shadow-md p-6 rounded-lg relative">
           {showPopup && (

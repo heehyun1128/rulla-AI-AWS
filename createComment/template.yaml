@@ -18,8 +18,8 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
-
+        AllowOrigin: "'http://localhost:3000'"
+        
   CreateCommentFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -191,12 +191,12 @@ Resources:
             RestApiId: !Ref MyApi
 
 Outputs:
-  MyApiEndpoint:
-    Description: "API Gateway endpoint URL for Prod stage"
+  CreateCommentApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
   CreateCommentFunction:
-    Description: "Create Comment Lambda Function ARN"
+    Description: "Hello World Lambda Function ARN"
     Value: !GetAtt CreateCommentFunction.Arn
   CreateCommentFunctionIamRole:
-    Description: "Implicit IAM Role created for Create Comment function"
+    Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt CreateCommentFunctionRole.Arn

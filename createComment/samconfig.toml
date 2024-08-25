@@ -21,6 +21,7 @@ stack_name = "local-lambda"
 s3_prefix = "local-lambda"
 region = "us-west-2"
 image_repositories = []
+disable_rollback = true
 
 [default.package.parameters]
 resolve_s3 = true
