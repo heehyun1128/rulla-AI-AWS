@@ -10,8 +10,8 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-import { corsMiddleware } from './cors.mjs';
-import dotenv from 'dotenv';
+
+import dotenv from "dotenv";
 dotenv.config();
 
 export const SelectedTextSchema = new dynamoose.Schema(
@@ -47,16 +47,31 @@ const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   const body = event.body ? JSON.parse(event.body) : null;
 
-  if (!body || !body.selectedTextId || !body.selectedText || !body.transcriptId || !body.commentId || !body.commentContent || !body.userId) {
+  if (
+    !body ||
+    !body.selectedTextId ||
+    !body.selectedText ||
+    !body.transcriptId ||
+    !body.commentId ||
+    !body.commentContent ||
+    !body.userId
+  ) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
     };
   }
-  const { selectedTextId, selectedText, transcriptId, commentId, commentContent, userId } = body;
+  const {
+    selectedTextId,
+    selectedText,
+    transcriptId,
+    commentId,
+    commentContent,
+    userId,
+  } = body;
   try {
     const newSelectedText = new SelectedTextModel({
       selectedTextId,
@@ -90,5 +105,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

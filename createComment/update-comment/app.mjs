@@ -11,7 +11,6 @@
  *
  */
 
-import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const CommentSchema = new dynamoose.Schema(
@@ -38,7 +37,7 @@ export const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let body;
@@ -61,7 +60,9 @@ const rawHandler = async (event) => {
   }
 
   try {
-    const existingComment = await CommentModel.get({ commentId: body.commentId });
+    const existingComment = await CommentModel.get({
+      commentId: body.commentId,
+    });
     if (!existingComment) {
       return {
         statusCode: 404,
@@ -69,15 +70,13 @@ const rawHandler = async (event) => {
       };
     }
 
-    const updatedComment = await CommentModel.update(
-      { commentId: body.commentId },
-      {
-        content: body.content,
-        selectedText: body.selectedText,
-        transcriptId: body.transcriptId,
-        userId: body.userId,
-      }
-    );
+    const updatedComment = await CommentModel.update({
+      commentId: body.commentId,
+      content: body.content,
+      selectedText: body.selectedText,
+      transcriptId: body.transcriptId,
+      userId: body.userId,
+    });
 
     return {
       statusCode: 200,
@@ -94,5 +93,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

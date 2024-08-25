@@ -11,9 +11,7 @@
  *
  */
 
-import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
-
 
 export const CommentSchema = new dynamoose.Schema(
   {
@@ -40,7 +38,7 @@ export const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let body;
@@ -54,14 +52,22 @@ const rawHandler = async (event) => {
     };
   }
 
-  const requiredFields = ['commentId', 'content', 'selectedText', 'transcriptId', 'userId'];
-  const missingFields = requiredFields.filter(field => !body[field]);
+  const requiredFields = [
+    "commentId",
+    "content",
+    "selectedText",
+    "transcriptId",
+    "userId",
+  ];
+  const missingFields = requiredFields.filter((field) => !body[field]);
 
   if (missingFields.length > 0) {
     console.error("Missing required fields:", missingFields);
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: `Missing required fields: ${missingFields.join(', ')}` }),
+      body: JSON.stringify({
+        error: `Missing required fields: ${missingFields.join(", ")}`,
+      }),
     };
   }
 
@@ -95,5 +101,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

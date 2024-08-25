@@ -10,7 +10,7 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-import { corsMiddleware } from './cors.mjs';
+
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
@@ -18,14 +18,8 @@ export const SelectedTextSchema = new dynamoose.Schema(
     selectedTextId: {
       type: String,
       hashKey: true,
-      required: true,
     },
-    selectedText: {
-      type: String,
-      required: true,
-    },
-    startIndex: Number,
-    endIndex: Number,
+    selectedText: String,
     transcriptId: String,
   },
   {
@@ -35,7 +29,7 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let transcriptId;
@@ -53,13 +47,17 @@ const rawHandler = async (event) => {
     console.error("Missing required parameter: transcriptId");
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing required parameter: transcriptId" }),
+      body: JSON.stringify({
+        error: "Missing required parameter: transcriptId",
+      }),
     };
   }
 
   try {
     // Fetch all selectedTexts for the given transcriptId
-    const selectedTexts = await SelectedTextModel.scan("transcriptId").eq(transcriptId).exec();
+    const selectedTexts = await SelectedTextModel.scan("transcriptId")
+      .eq(transcriptId)
+      .exec();
 
     console.log("Selected texts fetched successfully:", selectedTexts);
 
@@ -77,5 +75,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

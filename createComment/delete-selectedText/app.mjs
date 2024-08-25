@@ -11,7 +11,6 @@
  *
  */
 
-import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
@@ -19,14 +18,8 @@ export const SelectedTextSchema = new dynamoose.Schema(
     selectedTextId: {
       type: String,
       hashKey: true,
-      required: true,
     },
-    selectedText: {
-      type: String,
-      required: true,
-    },
-    startIndex: Number,
-    endIndex: Number,
+    selectedText: String,
     transcriptId: String,
   },
   {
@@ -36,7 +29,7 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let selectedTextId;
@@ -54,7 +47,9 @@ const rawHandler = async (event) => {
     console.error("Missing required parameter: selectedTextId");
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing required parameter: selectedTextId" }),
+      body: JSON.stringify({
+        error: "Missing required parameter: selectedTextId",
+      }),
     };
   }
 
@@ -88,5 +83,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

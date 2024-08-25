@@ -11,7 +11,6 @@
  *
  */
 
-import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const CommentSchema = new dynamoose.Schema(
@@ -38,7 +37,7 @@ export const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let transcriptId;
@@ -56,12 +55,16 @@ const rawHandler = async (event) => {
     console.error("Missing required parameter: transcriptId");
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing required parameter: transcriptId" }),
+      body: JSON.stringify({
+        error: "Missing required parameter: transcriptId",
+      }),
     };
   }
 
   try {
-    const comments = await CommentModel.scan("transcriptId").eq(transcriptId).exec();
+    const comments = await CommentModel.scan("transcriptId")
+      .eq(transcriptId)
+      .exec();
 
     console.log("Comments fetched successfully:", comments);
 
@@ -79,5 +82,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

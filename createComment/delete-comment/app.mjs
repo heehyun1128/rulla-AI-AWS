@@ -11,7 +11,6 @@
  *
  */
 
-import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const CommentSchema = new dynamoose.Schema(
@@ -38,7 +37,7 @@ export const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let commentId;
@@ -88,5 +87,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);

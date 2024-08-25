@@ -11,7 +11,6 @@
  *
  */
 
-import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
@@ -20,14 +19,7 @@ export const SelectedTextSchema = new dynamoose.Schema(
       type: String,
       hashKey: true,
     },
-    startIndex: {
-      type: Number,
-      required: true,
-    },
-    endIndex: {
-      type: Number,
-      required: true,
-    },
+    selectedText: String,
     transcriptId: String,
   },
   {
@@ -37,7 +29,7 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-const rawHandler = async (event) => {
+export const lambdaHandler = async (event) => {
   console.log("Received event:", JSON.stringify(event, null, 2));
 
   let body;
@@ -61,8 +53,8 @@ const rawHandler = async (event) => {
 
   try {
     const updatedSelectedText = await SelectedTextModel.update(
-      { selectedTextId: body.selectedTextId },
       {
+        selectedTextId: body.selectedTextId,
         startIndex: body.startIndex,
         endIndex: body.endIndex,
         transcriptId: body.transcriptId,
@@ -85,5 +77,3 @@ const rawHandler = async (event) => {
     };
   }
 };
-
-export const lambdaHandler = corsMiddleware(rawHandler);
