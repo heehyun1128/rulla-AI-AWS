@@ -10,15 +10,20 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
+import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
   {
     selectedTextId: {
       type: String,
+      hashKey: true,
       required: true,
     },
-
+    selectedText: {
+      type: String,
+      required: true,
+    },
     startIndex: Number,
     endIndex: Number,
     transcriptId: String,
@@ -30,64 +35,52 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-export const lambdaHandler = async (event) => {
-  const body = event.body ? JSON.parse(event.body) : null;
-  if (!body.selectedTextId) {
+const rawHandler = async (event) => {
+  console.log("Received event:", JSON.stringify(event, null, 2));
+
+  let selectedTextId;
+  try {
+    selectedTextId = event.pathParameters?.selectedTextId;
+  } catch (error) {
+    console.error("Error parsing event path parameters:", error);
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing selectedTextId" }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
+      body: JSON.stringify({ error: "Invalid request parameters" }),
+    };
+  }
 
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
+  if (!selectedTextId) {
+    console.error("Missing required parameter: selectedTextId");
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing required parameter: selectedTextId" }),
     };
   }
 
   try {
-    const { selectedTextId } = body;
     const selectedText = await SelectedTextModel.get({ selectedTextId });
     if (!selectedText) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: "SelectedText not found!" }),
-        headers: {
-          "Access-Control-Allow-Origin": "http://localhost:3000",
-
-          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-          "Access-Control-Allow-Headers":
-            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-        },
+        body: JSON.stringify({ error: "Selected text not found!" }),
       };
     }
 
+    console.log("Selected text fetched successfully:", selectedText);
+
     const response = {
       statusCode: 200,
-
       body: JSON.stringify(selectedText),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
 
     return response;
   } catch (err) {
+    console.error("Error fetching selected text:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
   }
 };
+
+export const lambdaHandler = corsMiddleware(rawHandler);

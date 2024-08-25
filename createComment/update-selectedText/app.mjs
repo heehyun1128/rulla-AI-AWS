@@ -11,16 +11,23 @@
  *
  */
 
+import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
   {
     selectedTextId: {
       type: String,
+      hashKey: true,
     },
-
-    startIndex: Number,
-    endIndex: Number,
+    startIndex: {
+      type: Number,
+      required: true,
+    },
+    endIndex: {
+      type: Number,
+      required: true,
+    },
     transcriptId: String,
   },
   {
@@ -30,75 +37,53 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-export const lambdaHandler = async (event) => {
-  const body = event.body ? JSON.parse(event.body) : null;
+const rawHandler = async (event) => {
+  console.log("Received event:", JSON.stringify(event, null, 2));
 
-  if (!body.selectedTextId || !body) {
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (error) {
+    console.error("Error parsing event body:", error);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid request body" }),
+    };
+  }
+
+  if (!body.selectedTextId || !body.startIndex || !body.endIndex) {
+    console.error("Missing required fields");
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
   }
 
   try {
-    const { selectedTextId, ...updateFields } = body;
-
-    const existingSelectedText = await SelectedTextModel.get({
-      selectedTextId,
-    });
-    if (!existingSelectedText) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "SelectedText not found" }),
-        headers: {
-          "Access-Control-Allow-Origin": "http://localhost:3000",
-          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-          "Access-Control-Allow-Headers":
-            "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-        },
-      };
-    }
-
     const updatedSelectedText = await SelectedTextModel.update(
-      { selectedTextId },
-      updateFields,
+      { selectedTextId: body.selectedTextId },
       {
-        return: "item",
-      }
+        startIndex: body.startIndex,
+        endIndex: body.endIndex,
+        transcriptId: body.transcriptId,
+      },
+      { return: "item" }
     );
 
-    const response = {
+    return {
       statusCode: 200,
-    
       body: JSON.stringify({
         message: "Successfully updated selectedText",
         selectedText: updatedSelectedText,
       }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
-
-    return response;
   } catch (err) {
+    console.error("Error updating selectedText:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: `Internal server error: ${err}` }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
+      body: JSON.stringify({ error: "Could not update the selectedText" }),
     };
   }
 };
+
+export const lambdaHandler = corsMiddleware(rawHandler);

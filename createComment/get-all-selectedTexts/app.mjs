@@ -10,14 +10,20 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
+import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
 
 export const SelectedTextSchema = new dynamoose.Schema(
   {
     selectedTextId: {
       type: String,
+      hashKey: true,
+      required: true,
     },
-
+    selectedText: {
+      type: String,
+      required: true,
+    },
     startIndex: Number,
     endIndex: Number,
     transcriptId: String,
@@ -29,22 +35,37 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-export const lambdaHandler = async (event) => {
+const rawHandler = async (event) => {
+  console.log("Received event:", JSON.stringify(event, null, 2));
+
+  let transcriptId;
   try {
-    // Fetch all selectedTexts
-    const selectedTexts = await SelectedTextModel.scan().exec();
+    transcriptId = event.queryStringParameters?.transcriptId;
+  } catch (error) {
+    console.error("Error parsing event query parameters:", error);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid request parameters" }),
+    };
+  }
+
+  if (!transcriptId) {
+    console.error("Missing required parameter: transcriptId");
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing required parameter: transcriptId" }),
+    };
+  }
+
+  try {
+    // Fetch all selectedTexts for the given transcriptId
+    const selectedTexts = await SelectedTextModel.scan("transcriptId").eq(transcriptId).exec();
+
+    console.log("Selected texts fetched successfully:", selectedTexts);
 
     const response = {
       statusCode: 200,
-
       body: JSON.stringify(selectedTexts),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
 
     return response;
@@ -53,13 +74,8 @@ export const lambdaHandler = async (event) => {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
   }
 };
+
+export const lambdaHandler = corsMiddleware(rawHandler);

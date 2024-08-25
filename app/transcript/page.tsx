@@ -5,19 +5,22 @@ import CommentSection from '@/components/CommentSection';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { createComment, getComments, updateComment, deleteComment, Comment } from '@/lib/api';
+import { createComment, getAllComments, updateComment, deleteComment, Comment } from '@/lib/api';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const TranscriptPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [selectedText, setSelectedText] = useState('');
-  const transcriptRef = useRef<HTMLDivElement>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null); 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [transcript, setTranscript] = useState('');
 
@@ -46,10 +49,14 @@ Sarah:
 
   const fetchComments = async () => {
     try {
-      const fetchedComments = await getComments('your-transcript-id');
+      setIsLoading(true);
+      const fetchedComments = await getAllComments('your-transcript-id');
+      console.log('Fetched comments:', fetchedComments);
       setComments(fetchedComments);
     } catch (error) {
       console.error('Error fetching comments:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,7 +87,7 @@ Sarah:
     }
   }, []);
 
-  const handleCommentClick = () => {
+  const handleAddComment = () => {
     setIsModalOpen(true);
     setEditingCommentId(null);
     setNewComment('');
@@ -90,30 +97,36 @@ Sarah:
   const handleSubmitComment = async () => {
     if (newComment.trim()) {
       try {
+        setIsLoading(true);
+        const commentId = uuidv4();
+        const newCommentData: Comment = {
+          commentId,
+          content: newComment.trim(),
+          transcriptId: 'your-transcript-id',
+          userId: 'your-user-id',
+          selectedTextId: selectedText,
+          isTemporary: true,
+        };
+
+        // Optimistically add the comment to the UI
+        setComments(prevComments => [...prevComments, newCommentData]);
+
+        // Perform API call without updating local state
         if (editingCommentId) {
-          const updatedComment = await updateComment({
-            commentId: editingCommentId,
-            content: newComment.trim(),
-            transcriptId: 'your-transcript-id',
-            userId: 'your-user-id',
-            selectedTextId: selectedText,
-          });
-          setComments(comments.map(c => c.commentId === updatedComment.commentId ? updatedComment : c));
+          await updateComment(editingCommentId, newCommentData);
         } else {
-          const createdComment = await createComment({
-            content: newComment.trim(),
-            transcriptId: 'your-transcript-id',
-            userId: 'your-user-id',
-            selectedTextId: selectedText,
-          });
-          setComments([...comments, createdComment]);
+          await createComment(newCommentData);
         }
+
         setNewComment('');
         setIsModalOpen(false);
         setEditingCommentId(null);
         setSelectedText('');
       } catch (error) {
         console.error('Error submitting comment:', error);
+        alert('Failed to submit comment to the server. The local comment will remain until the page is refreshed.');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -127,7 +140,7 @@ Sarah:
   const handleDeleteComment = async (commentId: string) => {
     try {
       await deleteComment(commentId);
-      setComments(comments.filter(comment => comment.commentId !== commentId));
+      setComments(prevComments => prevComments.filter(comment => comment.commentId !== commentId));
     } catch (error) {
       console.error('Error deleting comment:', error);
     }
@@ -160,11 +173,11 @@ Sarah:
               className="absolute bg-white shadow-md rounded-md p-2 flex space-x-2"
               style={{ 
                 top: `${popupPosition.top - 100}px`, 
-                left: `${popupPosition.left - 350}px`,
+                left: `${popupPosition.left}px`,
                 transform: 'translate(-50%, -100%)',
               }}
             >
-              <button onClick={handleCommentClick} className="p-1 hover:bg-gray-100 rounded">
+              <button onClick={handleAddComment} className="p-1 hover:bg-gray-100 rounded">
                 <MessageSquare size={20} className="text-dark" />
               </button>
               <button onClick={handleImageClick} className="p-1 hover:bg-gray-100 rounded">
@@ -185,9 +198,10 @@ Sarah:
         </div>
         <CommentSection 
           comments={comments} 
+          onAdd={handleAddComment} 
           onEdit={handleEditComment} 
           onDelete={handleDeleteComment}
-          onAdd={handleCommentClick}
+          isLoading={isLoading}
         />
       </div>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -203,7 +217,12 @@ Sarah:
           />
           <DialogFooter>
             <Button onClick={handleCloseModal} variant="outline" className="text-dark">Cancel</Button>
-            <Button onClick={handleSubmitComment}>{editingCommentId ? 'Update' : 'Submit'}</Button>
+            <Button onClick={handleSubmitComment} disabled={isLoading}>
+              {isLoading ? (
+                <AiOutlineLoading3Quarters className="animate-spin mr-2" />
+              ) : null}
+              {editingCommentId ? 'Update' : 'Submit'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -10,17 +10,17 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-import dynamoose from "dynamoose";
-import { v4 as uuidv4 } from 'uuid';
+import { corsMiddleware } from './cors.mjs';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const SelectedTextSchema = new dynamoose.Schema(
   {
     selectedTextId: {
       type: String,
+      hashKey: true,
     },
-
-    startIndex: Number,
-    endIndex: Number,
+    selectedText: String,
     transcriptId: String,
   },
   {
@@ -30,49 +30,56 @@ export const SelectedTextSchema = new dynamoose.Schema(
 
 const SelectedTextModel = dynamoose.model("SelectedTexts", SelectedTextSchema);
 
-export const lambdaHandler = async (event) => {
+const CommentSchema = new dynamoose.Schema(
+  {
+    commentId: {
+      type: String,
+      hashKey: true,
+    },
+    selectedTextId: String,
+    content: String,
+    userId: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const CommentModel = dynamoose.model("Comments", CommentSchema);
+
+const rawHandler = async (event) => {
   const body = event.body ? JSON.parse(event.body) : null;
 
-  if (!body) {
+  if (!body || !body.selectedTextId || !body.selectedText || !body.transcriptId || !body.commentId || !body.commentContent || !body.userId) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required fields" }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
   }
-  const { startIndex, endIndex, transcriptId } = body;
+  const { selectedTextId, selectedText, transcriptId, commentId, commentContent, userId } = body;
   try {
-    const selectedTextId = uuidv4();
     const newSelectedText = new SelectedTextModel({
       selectedTextId,
-
-      startIndex,
-      endIndex,
+      selectedText,
       transcriptId,
-      // createdAt: new Date().toISOString(),
     });
     await newSelectedText.save();
 
+    const newComment = new CommentModel({
+      commentId,
+      selectedTextId,
+      content: commentContent,
+      userId,
+    });
+    await newComment.save();
+
     const response = {
       statusCode: 201,
-
       body: JSON.stringify({
-        message: "Successfully created a selected text",
+        message: "Successfully created a selected text with comment",
         selectedText: newSelectedText,
+        comment: newComment,
       }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
 
     return response;
@@ -80,13 +87,8 @@ export const lambdaHandler = async (event) => {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
   }
 };
+
+export const lambdaHandler = corsMiddleware(rawHandler);

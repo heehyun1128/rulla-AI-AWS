@@ -11,19 +11,27 @@
  *
  */
 
+import { corsMiddleware } from './cors.mjs';
 import dynamoose from "dynamoose";
-import { v4 as uuidv4 } from 'uuid';
+
 
 export const CommentSchema = new dynamoose.Schema(
   {
     commentId: {
       type: String,
+      hashKey: true,
+      required: true,
     },
-    content: String,
+    content: {
+      type: String,
+      required: true,
+    },
+    selectedText: {
+      type: String,
+      required: true,
+    },
     transcriptId: String,
     userId: String,
-    selectedTextId: String,
-    // "commentImageUrl": { type: String, required: false },
   },
   {
     timestamps: true,
@@ -32,63 +40,60 @@ export const CommentSchema = new dynamoose.Schema(
 
 const CommentModel = dynamoose.model("Comments", CommentSchema);
 
-export const lambdaHandler = async (event) => {
-  const body = event.body ? JSON.parse(event.body) : null;
+const rawHandler = async (event) => {
+  console.log("Received event:", JSON.stringify(event, null, 2));
 
-  if (!body) {
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (error) {
+    console.error("Error parsing event body:", error);
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing required fields" }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-      },
+      body: JSON.stringify({ error: "Invalid request body" }),
     };
   }
-  const {  content, transcriptId, userId, selectedTextId } = body;
+
+  const requiredFields = ['commentId', 'content', 'selectedText', 'transcriptId', 'userId'];
+  const missingFields = requiredFields.filter(field => !body[field]);
+
+  if (missingFields.length > 0) {
+    console.error("Missing required fields:", missingFields);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: `Missing required fields: ${missingFields.join(', ')}` }),
+    };
+  }
+
+  const { commentId, content, selectedText, transcriptId, userId } = body;
   try {
-    const commentId = uuidv4();
     const newComment = new CommentModel({
       commentId,
       content,
+      selectedText,
       transcriptId,
       userId,
-      selectedTextId,
-      // createdAt: new Date().toISOString(),
     });
     await newComment.save();
 
+    console.log("Comment created successfully:", newComment);
+
     const response = {
       statusCode: 201,
-
       body: JSON.stringify({
         message: "Successfully created a comment",
         comment: newComment,
       }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
 
     return response;
   } catch (err) {
+    console.error("Error creating comment:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: `Internal server error: ${err}` }),
-      headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
-
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Headers":
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-      },
     };
   }
 };
+
+export const lambdaHandler = corsMiddleware(rawHandler);
